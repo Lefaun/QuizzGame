@@ -44,6 +44,8 @@
                 correctAnswer: parseInt(formData.get('correctAnswer'))
             };
 
+            console.log('Submitting question data:', questionData); // Log the data
+
             try {
                 const response = await fetch(`${API_URL}/api/submit-question`, {
                     method: 'POST',
@@ -52,13 +54,18 @@
                     },
                     body: JSON.stringify(questionData)
                 });
-                if (!response.ok) throw new Error('Submission failed');
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Submission failed');
+                }
+
                 const result = await response.json();
                 document.getElementById('submitResult').textContent = result.message;
                 e.target.reset();
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('submitResult').textContent = 'Failed to submit question. Please try again.';
+                document.getElementById('submitResult').textContent = `Failed to submit question: ${error.message}`; // Display error message
             }
         });
 
