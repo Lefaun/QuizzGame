@@ -16,7 +16,7 @@ app.use(express.static('public')); // Serve static files from 'public'
 
 // PostgreSQL connection
 const pool = new Pool({
-    connectionString: 'postgresql://quizz:h8jkWUtN03pf8peoiUnpbbsu3wiDuGeI@dpg-crsk9jggph6c738uksvg-a/quizz_5211',
+    connectionString: 'postgresql://quizz:h8jkWUtN03pf8peoiUnpbbsu3wiDuGeI@dpg-crsk9jggph6c738uksvg-a.oregon-postgres.render.com/quizz_5211',
     ssl: {
         rejectUnauthorized: false
     }
