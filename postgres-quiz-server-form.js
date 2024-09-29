@@ -52,6 +52,14 @@ async function initializeDatabase() {
 initializeDatabase();
 
 // Endpoint to handle individual question submission
+const questionData = {
+    question: formData.get('question'),
+    option1: formData.get('option1'),
+    option2: formData.get('option2'),
+    correctAnswer: parseInt(formData.get('correctAnswer')) // Ensure this is an integer
+};
+
+
 app.post('/api/submit-question', async (req, res) => {
     const { question, option1, option2, correctAnswer } = req.body;
     
