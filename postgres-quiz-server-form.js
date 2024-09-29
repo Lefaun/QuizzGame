@@ -2,22 +2,17 @@ const express = require('express');
 const { Pool } = require('pg');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
+// Enable CORS for your frontend
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'https://quizz-game-3q0f.onrender.com/'
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000'
 }));
-app.use(bodyParser.json());
-app.use(express.static('public')); // Serve static files from 'public'
 
-// Serve index.html on root
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.use(bodyParser.json());
+app.use(express.static('public'));
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -27,10 +22,9 @@ const pool = new Pool({
     }
 });
 
-// Initialize database and create table
 async function initializeDatabase() {
+    const client = await pool.connect();
     try {
-        const client = await pool.connect();
         await client.query(`
             CREATE TABLE IF NOT EXISTS questions (
                 id SERIAL PRIMARY KEY,
@@ -41,21 +35,18 @@ async function initializeDatabase() {
             )
         `);
         console.log('Connected to PostgreSQL database');
+    } finally {
         client.release();
-    } catch (error) {
-        console.error('Error initializing database:', error);
-        process.exit(1);
     }
 }
 
-// Call the function to initialize the database
 initializeDatabase();
 
 // Endpoint to handle individual question submission
 app.post('/api/submit-question', async (req, res) => {
     console.log('Received question data:', req.body); // Log incoming data
     const { question, option1, option2, correctAnswer } = req.body;
-    
+
     if (!question || !option1 || !option2 || correctAnswer === undefined) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -66,7 +57,7 @@ app.post('/api/submit-question', async (req, res) => {
         await client.query(queryText, [question, option1, option2, correctAnswer]);
         res.status(201).json({ message: 'Question added successfully' });
     } catch (error) {
-        console.error('Error inserting question:', error); // Log the error
+        console.error('Error inserting question:', error);
         res.status(500).json({ error: 'Failed to add question' });
     } finally {
         client.release();
@@ -93,7 +84,6 @@ app.get('/api/random-questions', async (req, res) => {
     }
 });
 
-// Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
