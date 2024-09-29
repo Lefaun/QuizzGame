@@ -4,7 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Quiz Game (Question Submission)</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .question, .submit-form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"], button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result, #submitResult {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Online Quiz Game</h1>
@@ -27,7 +57,7 @@
     <div id="result"></div>
 
     <script>
-        const API_URL = 'de32c7300438c18386907ecc96b95d39'; // Replace with your actual deployed URL
+        const API_URL = 'https://quizz-game-3q0f.onrender.com'; // Your backend API URL
 
         let questions = [];
         let currentQuestion = 0;
@@ -44,8 +74,6 @@
                 correctAnswer: parseInt(formData.get('correctAnswer'))
             };
 
-            console.log('Submitting question data:', questionData); // Log the data
-
             try {
                 const response = await fetch(`${API_URL}/api/submit-question`, {
                     method: 'POST',
@@ -54,18 +82,13 @@
                     },
                     body: JSON.stringify(questionData)
                 });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Submission failed');
-                }
-
+                if (!response.ok) throw new Error('Submission failed');
                 const result = await response.json();
                 document.getElementById('submitResult').textContent = result.message;
                 e.target.reset();
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('submitResult').textContent = `Failed to submit question: ${error.message}`; // Display error message
+                document.getElementById('submitResult').textContent = 'Failed to submit question. Please try again.';
             }
         });
 
