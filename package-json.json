@@ -1,0 +1,22 @@
+{
+  "name": "online-quiz-game",
+  "version": "1.0.0",
+  "description": "An online quiz game with a PostgreSQL backend",
+  "main": "postgres-quiz-server-form.js",
+  "scripts": {
+    "start": "node postgres-quiz-server-form.js",
+    "dev": "nodemon postgres-quiz-server-form.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.7.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "engines": {
+    "node": "14.x"
+  }
+}
