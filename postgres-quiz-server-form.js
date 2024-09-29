@@ -12,7 +12,7 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static('public')); // Serve static files from 'public'
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -22,29 +22,13 @@ const pool = new Pool({
     }
 });
 
-async function initializeDatabase() {
-    const client = await pool.connect();
-    try {
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS questions (
-                id SERIAL PRIMARY KEY,
-                question TEXT NOT NULL,
-                option1 VARCHAR(255) NOT NULL,
-                option2 VARCHAR(255) NOT NULL,
-                correct_answer INT NOT NULL
-            )
-        `);
-        console.log('Connected to PostgreSQL database');
-    } finally {
-        client.release();
-    }
-}
+// Root route
+app.get('/', (req, res) => {
+    res.send('Welcome to the Online Quiz API!');
+});
 
-initializeDatabase();
-
-// Endpoint to handle individual question submission
+// Endpoint to handle question submission
 app.post('/api/submit-question', async (req, res) => {
-    console.log('Received question data:', req.body); // Log incoming data
     const { question, option1, option2, correctAnswer } = req.body;
 
     if (!question || !option1 || !option2 || correctAnswer === undefined) {
