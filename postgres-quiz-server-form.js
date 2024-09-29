@@ -12,11 +12,11 @@ app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000'
 }));
 app.use(bodyParser.json());
-app.use(express.static('public')); // Optional if you have other static files
+app.use(express.static('public')); // Serve static files from 'public'
 
 // Serve index.html on root
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html')); // Adjust the path to your HTML file
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // PostgreSQL connection
@@ -52,15 +52,8 @@ async function initializeDatabase() {
 initializeDatabase();
 
 // Endpoint to handle individual question submission
-const questionData = {
-    question: formData.get('question'),
-    option1: formData.get('option1'),
-    option2: formData.get('option2'),
-    correctAnswer: parseInt(formData.get('correctAnswer')) // Ensure this is an integer
-};
-
-
 app.post('/api/submit-question', async (req, res) => {
+    console.log('Received question data:', req.body); // Log incoming data
     const { question, option1, option2, correctAnswer } = req.body;
     
     if (!question || !option1 || !option2 || correctAnswer === undefined) {
