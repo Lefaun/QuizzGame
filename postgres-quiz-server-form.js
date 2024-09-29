@@ -1,18 +1,3 @@
-
-
-const express = require('express');
-const app = express();
-
-app.get('/', (req, res) => {
-    res.send('Welcome to the Quiz App!');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-
-
 const express = require('express');
 const { Pool } = require('pg');
 const bodyParser = require('body-parser');
@@ -21,10 +6,10 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000'
 }));
-
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
@@ -36,9 +21,10 @@ const pool = new Pool({
   }
 });
 
+// Initialize database and create table
 async function initializeDatabase() {
-  const client = await pool.connect();
   try {
+    const client = await pool.connect();
     await client.query(`
       CREATE TABLE IF NOT EXISTS questions (
         id SERIAL PRIMARY KEY,
@@ -49,11 +35,14 @@ async function initializeDatabase() {
       )
     `);
     console.log('Connected to PostgreSQL database');
-  } finally {
     client.release();
+  } catch (error) {
+    console.error('Error initializing database:', error);
+    process.exit(1); // Exit if the database initialization fails
   }
 }
 
+// Call the function to initialize the database
 initializeDatabase();
 
 // Endpoint to handle individual question submission
@@ -97,6 +86,7 @@ app.get('/api/random-questions', async (req, res) => {
   }
 });
 
+// Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
