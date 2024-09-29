@@ -16,11 +16,12 @@ app.use(express.static('public')); // Serve static files from 'public'
 
 // PostgreSQL connection
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: 'postgres://<quizz>:<h8jkWUtN03pf8peoiUnpbbsu3wiDuGeI>@dpg-crsk9jggph6c738uksvg-a:<5432>/<quizz_5211>',
     ssl: {
         rejectUnauthorized: false
     }
 });
+
 
 // Root route
 app.get('/', (req, res) => {
