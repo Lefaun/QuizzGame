@@ -6,6 +6,8 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
+require('dotenv').config();
+
 // Enable CORS for your frontend
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000'
@@ -16,7 +18,7 @@ app.use(express.static('public')); // Serve static files from 'public'
 
 // PostgreSQL connection
 const pool = new Pool({
-    connectionString: 'postgresql://quizz:h8jkWUtN03pf8peoiUnpbbsu3wiDuGeI@dpg-crsk9jggph6c738uksvg-a.oregon-postgres.render.com/quizz_5211',
+    connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false
     }
