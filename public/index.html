@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Quiz Game (Question Submission)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .question, .submit-form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"], button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result, #submitResult {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Online Quiz Game</h1>
+    
+    <div class="submit-form">
+        <h2>Submit a New Question</h2>
+        <form id="questionForm">
+            <input type="text" id="question" placeholder="Enter the question" required>
+            <input type="text" id="option1" placeholder="Enter option 1" required>
+            <input type="text" id="option2" placeholder="Enter option 2" required>
+            <input type="number" id="correctAnswer" placeholder="Correct answer (0 or 1)" min="0" max="1" required>
+            <button type="submit">Submit Question</button>
+        </form>
+        <div id="submitResult"></div>
+    </div>
+
+    <button onclick="startQuiz()">Start Quiz</button>
+
+    <div id="quiz"></div>
+    <div id="result"></div>
+
+    <script>
+        const API_URL = 'https://quizz-game-3q0f.onrender.com'; // Your backend API URL
+
+        let questions = [];
+        let currentQuestion = 0;
+        let score = 0;
+
+        // Question submission handling
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const questionData = {
+                question: formData.get('question'),
+                option1: formData.get('option1'),
+                option2: formData.get('option2'),
+                correctAnswer: parseInt(formData.get('correctAnswer'))
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/submit-question`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(questionData)
+                });
+                if (!response.ok) throw new Error('Submission failed');
+                const result = await response.json();
+                document.getElementById('submitResult').textContent = result.message;
+                e.target.reset();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('submitResult').textContent = 'Failed to submit question. Please try again.';
+            }
+        });
+
+        async function fetchQuestions() {
+            try {
+                const response = await fetch(`${API_URL}/api/random-questions?count=5`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch questions');
+                }
+                questions = await response.json();
+                displayQuestion();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('quiz').innerHTML = 'Failed to load questions. Please try again later.';
+            }
+        }
+
+        function displayQuestion() {
+            const quizContainer = document.getElementById('quiz');
+            const question = questions[currentQuestion];
+
+            let html = `
+                <div class="question">
+                    <h2>Question ${currentQuestion + 1}</h2>
+                    <p>${question.question}</p>
+                    ${question.options.map((option, index) => `
+                        <button onclick="checkAnswer(${index})">${option}</button>
+                    `).join('')}
+                </div>
+            `;
+
+            quizContainer.innerHTML = html;
+        }
+
+        function checkAnswer(selectedIndex) {
+            const question = questions[currentQuestion];
+            if (selectedIndex === question.correctAnswer) {
+                score++;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                displayQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const resultContainer = document.getElementById('result');
+            resultContainer.innerHTML = `You scored ${score} out of ${questions.length}!`;
+        }
+
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('result').innerHTML = '';
+            fetchQuestions();
+        }
+    </script>
+</body>
+</html>
