@@ -66,7 +66,7 @@ app.post('/api/submit-question', async (req, res) => {
         await client.query(queryText, [question, option1, option2, correctAnswer]);
         res.status(201).json({ message: 'Question added successfully' });
     } catch (error) {
-        console.error('Error inserting question:', error);
+        console.error('Error inserting question:', error); // Log the error
         res.status(500).json({ error: 'Failed to add question' });
     } finally {
         client.release();
