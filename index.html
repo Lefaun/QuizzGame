@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Quiz Game (Question Submission)</title>
-    <style>
-        /* Your existing styles */
-    </style>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to CSS file -->
 </head>
 <body>
     <h1>Online Quiz Game</h1>
@@ -29,7 +27,7 @@
     <div id="result"></div>
 
     <script>
-        const API_URL = 'de32c7300438c18386907ecc96b95d39'; // Set your API URL directly
+        const API_URL = 'https://your-api-url.com'; // Replace with your actual deployed URL
 
         let questions = [];
         let currentQuestion = 0;
@@ -67,7 +65,9 @@
         async function fetchQuestions() {
             try {
                 const response = await fetch(`${API_URL}/api/random-questions?count=5`);
-                if (!response.ok) throw new Error('Failed to fetch questions');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch questions');
+                }
                 questions = await response.json();
                 displayQuestion();
             } catch (error) {
@@ -77,7 +77,6 @@
         }
 
         function displayQuestion() {
-            if (currentQuestion >= questions.length) return; // Safety check
             const quizContainer = document.getElementById('quiz');
             const question = questions[currentQuestion];
 
@@ -112,15 +111,12 @@
         function showResult() {
             const resultContainer = document.getElementById('result');
             resultContainer.innerHTML = `You scored ${score} out of ${questions.length}!`;
-            // Optionally add a button to restart the quiz
-            resultContainer.innerHTML += `<button onclick="startQuiz()">Restart Quiz</button>`;
         }
 
         function startQuiz() {
             currentQuestion = 0;
             score = 0;
             document.getElementById('result').innerHTML = '';
-            document.getElementById('quiz').innerHTML = ''; // Clear previous questions
             fetchQuestions();
         }
     </script>
